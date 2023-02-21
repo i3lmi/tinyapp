@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/i3lmi/tinyapp/issues"
   },
-  "homepage": "https://github.com/i3lmi/tinyapp#readme"
+  "homepage": "https://github.com/i3lmi/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
