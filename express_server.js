@@ -109,4 +109,9 @@ app.get("/urls.json", (req, res) => {
     res.render('urls_index', { username });
   });
   
+  app.post("/logout", (req, res) => {
+    res.clearCookie("username"); // clear the username cookie
+    res.redirect("/urls"); // redirect the user back to the /urls page
+  });
+  
 
