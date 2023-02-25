@@ -3,14 +3,8 @@ const app = express();
 const cookieParser = require('cookie-parser')
 const PORT = 8080; // default port 8080
 
-app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cookieParser());
-app.use((req, res, next) => {
-  res.locals.username = req.cookies.username;
-  next();
-});
 
 app.set("view engine", "ejs");
 
@@ -102,12 +96,9 @@ app.get("/urls/new", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  const longURL = req.body.longURL; 
-  const id = generateRandomString(); 
-  urlDatabase[id] = { longURL: longURL, userID: req.cookies.user_id }; // store the userID with the new URL
-  res.redirect(`/urls/${id}`); 
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
-
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
