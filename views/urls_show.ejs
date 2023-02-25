@@ -12,25 +12,13 @@
   </head>
 
   <body>
-    <% include ('partials/_header') %>
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <% if (user && url.userID === user.id) { %>
-          <h5 class="card-title">TinyURL for: <%= url.longURL %></h5>
-          <form method="POST" action="/urls/<%= url.id %>">
-            <div class="form-group">
-              <label for="longURLInput">New Long URL:</label>
-              <input type="text" class="form-control" id="longURLInput" name="longURL" value="<%= url.longURL %>">
-            </div>
-            <button type="submit" class="btn btn-primary">Update URL</button>
-          </form>
-          <p class="card-text">
-            Short URL ID: <a href="/u/<%= url.id %>"><%= url.id %></a>
-          </p>
-        <% } else { %>
-          <h2><%= message %></h2>
-        <% } %>
+        <h5 class="card-title">TinyURL for: <%= longURL.longURL %></h5>
+        <p class="card-text">
+          Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
+        </p>
       </div>
       <div class="card-footer text-muted"></div>
     </div>

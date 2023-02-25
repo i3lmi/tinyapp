@@ -35,18 +35,18 @@ const urlDatabase = {
   }
 };
 
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
+// const users = {
+//   userRandomID: {
+//     id: "userRandomID",
+//     email: "user@example.com",
+//     password: "purple-monkey-dinosaur",
+//   },
+//   user2RandomID: {
+//     id: "user2RandomID",
+//     email: "user2@example.com",
+//     password: "dishwasher-funk",
+//   },
+// };
 
 
 const urlsForUser = (id) => {
@@ -94,11 +94,11 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.get('/urls', (req, res) => {
-  const userId = req.cookies.user_id;
-  const user = users[userId];
-  res.render('urls_index', { message: 'Welcome to TinyApp!', user: user });
-});
+// app.get('/urls', (req, res) => {
+//   const userId = req.cookies.user_id;
+//   const user = users[userId];
+//   res.render('urls_index', { message: 'Welcome to TinyApp!', user: user });
+// });
 
 
 app.post("/urls", (req, res) => {
@@ -108,10 +108,14 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`); 
 });
 
-app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id]; 
-  res.redirect(longURL.longURL); // access the longURL property of the URL object
+
+app.get("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[req.params.id];
+  const templateVars = { id, longURL };
+  res.render("urls_show", templateVars);
 });
+
 
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
