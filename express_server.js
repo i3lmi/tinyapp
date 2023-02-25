@@ -1,8 +1,16 @@
 const express = require("express");
 const app = express();
+const cookieParser = require('cookie-parser')
 const PORT = 8080; // default port 8080
 
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser());
+app.use((req, res, next) => {
+  res.locals.username = req.cookies.username;
+  next();
+});
 
 app.set("view engine", "ejs");
 function generateRandomString() {
@@ -91,5 +99,14 @@ app.get("/urls.json", (req, res) => {
     res.cookie('username', username);
     res.redirect('/urls');
   });
-      
+  app.get('/', (req, res) => {
+    const username = req.cookies["username"];
+    res.render('index', { username });
+  });
   
+  app.get('/urls', (req, res) => {
+    const username = req.cookies["username"];
+    res.render('urls_index', { username });
+  });
+  
+
