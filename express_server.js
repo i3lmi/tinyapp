@@ -89,11 +89,6 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// app.get('/urls', (req, res) => {
-//   const userId = req.cookies.user_id;
-//   const user = users[userId];
-//   res.render('urls_index', { message: 'Welcome to TinyApp!', user: user });
-// });
 
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL; 
@@ -106,16 +101,11 @@ app.post("/urls", (req, res) => {
   
 });
 
-// app.get("/urls/:id", (req, res) => {
-//   const templateVars = { longURL: urlDatabase[req.params.id] };
-//   res.render("urls_show", templateVars);
-// });
-
-
-app.post("/urls/:id/delete", (req, res) => {
-  const id = req.params.id;
-  delete urlDatabase[id];
-  res.redirect("/urls");
+// DELETE route for removing a URL resource
+app.post('/urls/:id/delete', (req, res) => {
+  const shortURL = req.params.id;
+  delete urlDatabase[shortURL];
+  res.redirect('/urls');
 });
 
 app.post("/urls/:id", (req, res) => {
@@ -177,17 +167,4 @@ app.post('/urls', (req, res) => {
 
 });
 
-// app.get('/urls/:id', (req, res) => {
-//   const id = req.params.id;
-//   const longURL = urlDatabase[id].longURL;
-//   const shortURL = id;
-//   res.render('urls_show', { id, longURL, shortURL });
-// });
-// //duplicates
-// app.get('/urls/:id', (req, res) => {
-//   const id = req.params.id;
-//   const longURL = urlDatabase[id].longURL;
-//   const shortURL = id;
-//   res.render('urls_show', { id, longURL, shortURL });
-// });
-// 
+
