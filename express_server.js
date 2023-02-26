@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const { response } = require("express");
 const PORT = 8080; // default port 8080
 
 app.use(express.urlencoded({ extended: true }));
@@ -29,7 +30,7 @@ const urlDatabase = {
   }
 };
 
-// const users = {
+// const users = 
 //   userRandomID: {
 //     id: "userRandomID",
 //     email: "user@example.com",
@@ -94,18 +95,21 @@ app.get("/urls/new", (req, res) => {
 //   res.render('urls_index', { message: 'Welcome to TinyApp!', user: user });
 // });
 
-
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const longURL = req.body.longURL; 
+  const id = generateRandomString(); 
+  urlDatabase[id] = {
+    longURL: longURL,
+    userID: req.cookies.user_id
+  };
+  res.redirect(`/urls/${id}`); 
+  
 });
 
-app.get("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[req.params.id];
-  const templateVars = { id, longURL };
-  res.render("urls_show", templateVars);
-});
+// app.get("/urls/:id", (req, res) => {
+//   const templateVars = { longURL: urlDatabase[req.params.id] };
+//   res.render("urls_show", templateVars);
+// });
 
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -121,7 +125,21 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-app
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id]; 
+  res.redirect(longURL); 
+});
+
+// GET /u/:id
+app.get("/u/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  if(!urlDatabase[shortURL]){
+    res.send("URL for the given ID does not exist")
+  }
+  let longURL = urlDatabase[shortURL].longURL;
+  res.redirect(longURL);
+});
+
 
 
 app.get('/register', (req, res) => {
@@ -144,3 +162,32 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get("/urls/:id", (req, res) => {
+  const templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id].longURL };
+  console.log(templateVars)
+  res.render("urls_show", templateVars);
+});
+
+app.post('/urls', (req, res) => {
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  // Store the shortURL and longURL pair in the database here
+  db[shortURL] = longURL;
+  res.render('urls_show', { longURL: longURL, shortURL: shortURL });
+
+});
+
+// app.get('/urls/:id', (req, res) => {
+//   const id = req.params.id;
+//   const longURL = urlDatabase[id].longURL;
+//   const shortURL = id;
+//   res.render('urls_show', { id, longURL, shortURL });
+// });
+// //duplicates
+// app.get('/urls/:id', (req, res) => {
+//   const id = req.params.id;
+//   const longURL = urlDatabase[id].longURL;
+//   const shortURL = id;
+//   res.render('urls_show', { id, longURL, shortURL });
+// });
+// 
