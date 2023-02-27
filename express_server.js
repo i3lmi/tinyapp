@@ -1,117 +1,73 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
-const cookieParser = require('cookie-parser')
 const PORT = 8080; // default port 8080
 
-app.use(cookieParser())
-app.use(express.urlencoded({ extended: true }));
-
-app.use(cookieParser());
-app.use((req, res, next) => {
-  res.locals.username = req.cookies.username;
-  next();
-});
-
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
+
 function generateRandomString() {
-  let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
+  let result = '';
   for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 }
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2":  "http://www.lighthouselabs.ca",
+  "9sm5xK":   "http://www.google.com" 
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.send("Hello World!");
+});
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+app.post("/urls", (req, res) => {
+  const randomStr = generateRandomString();
+  urlDatabase[randomStr] = req.body.longURL
+  res.redirect(`/urls/${randomStr}`);
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
+  const templateVars = { shortURL, longURL };
+  res.render("urls_show", templateVars);
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-app.get("/urls.json", (req, res) => {
-    res.json(urlDatabase);
-  });
-
-  app.get("/hello", (req, res) => {
-    res.send("<html><body>Hello <b>World</b></body></html>\n");
-  });
-
-  app.get("/urls", (req, res) => {
-    const templateVars = { urls: urlDatabase };
-    res.render("urls_index", templateVars);
-  });
-  app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
-  });
-
-  app.get("/urls/:id", (req, res) => {
-    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
-    res.render("urls_show", templateVars);
-  });
-
-  app.post("/urls", (req, res) => {
-    const longURL = req.body.longURL; 
-    const id = generateRandomString(); 
-    urlDatabase[id] = longURL; 
-    res.redirect(`/urls/${id}`); 
-  });
-
-  app.get("/u/:id", (req, res) => {
-    const longURL = urlDatabase[req.params.id]; 
-    res.redirect(longURL); 
-  });
-  
-  app.post("/urls/:id/delete", (req, res) => {
-    const id = req.params.id;
-    delete urlDatabase[id];
-    res.redirect("/urls");
-  });
-
-  app.post("/urls/:id", (req, res) => {
-    const shortURL = req.params.id;
-    const newLongURL = req.body.longURL;
-    urlDatabase[shortURL] = newLongURL; 
-    res.redirect("/urls");
-  });
-
-  app.post("/urls/:id", (req, res) => {
-    const id = req.params.id;
-    const longURL = req.body.longURL;
-    urlDatabase[id] = longURL;
-    res.redirect("/urls");
-  });
-  app.post("/login", (req, res) => {
-    const username = req.body.username;
-    res.cookie("username", username);
-    res.redirect("/urls");
-  });
-  app.post('/login', (req, res) => {
-    const username = req.body.username;
-    res.cookie('username', username);
-    res.redirect('/urls');
-  });
-  app.get('/', (req, res) => {
-    const username = req.cookies["username"];
-    res.render('index', { username });
-  });
-  
-  app.get('/urls', (req, res) => {
-    const username = req.cookies["username"];
-    res.render('urls_index', { username });
-  });
-  
-  app.post("/logout", (req, res) => {
-    res.clearCookie("username"); // clear the username cookie
-    res.redirect("/urls"); // redirect the user back to the /urls page
-  });
-  
 
