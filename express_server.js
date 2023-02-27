@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const cookieSession = require("cookie-session");
+const bodyParser = require("body-parser");
 const PORT = 8080; // default port 8080
 const {
   generateRandomString,
@@ -12,30 +14,20 @@ const {
   changeStatus,
 } = require("./helpers/helpers");
 
-const cookieSession = require("cookie-session");
-const bodyParser = require("body-parser");
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cookieSession({
     name: "session",
     keys: ["key1", "key2"],
 
-    // Cookie Options
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
 
 app.set("view engine", "ejs");
-
+let isLoggedIn = false;
 const urlDatabase = {};
 const users = {};
-
 let status = 200;
-
-let isLoggedIn = false;
-
-//              URL Routes
 
 app.get("/urls", (req, res) => {
   status = res.statusCode;
@@ -132,8 +124,6 @@ app.post("/urls/:id", (req, res) => {
     res.redirect(`${currentURL}`);
   }
 });
-
-// Reguster Routes
 
 app.get("/register", (req, res) => {
   status = res.statusCode;
