@@ -9,17 +9,17 @@ const {
   getUserByEmail,
   hashPassword,
   isEqualToHash,
-  userDatabase,
+  database,
   statusMessage,
   changeStatus,
 } = require("./helpers/helpers");
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cookieSession({
     name: "session",
     keys: ["key1", "key2"],
-
   })
 );
 
@@ -36,7 +36,7 @@ app.get("/urls", (req, res) => {
     res.redirect("/status");
   } else {
     const userID = req.session.userID;
-    const usersUrl = userDatabase(userID, urlDatabase);
+    const usersUrl = database(userID, urlDatabase);
     const email = users[userID].email;
     const templateVars = {
       userID,
@@ -85,6 +85,20 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  if (urlDatabase[req.params.shortURL]) {
+    let longURL = urlDatabase[req.params.shortURL].longURL;
+    if (!longURL.includes("https://")) {
+      longURL = "https://" + longURL;
+    }
+
+    res.status(302).redirect(longURL);
+  } else {
+    const errorMessage = "This short URL does not exist.";
+    res.status(404).send(errorMessage);
+  }
+});
+
 app.get("/urls/:shortURL", (req, res) => {
   status = res.statusCode;
   if (isLoggedIn) {
@@ -119,7 +133,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const currentURL = req.params.id;
   const userID = req.session.userID;
-  const currentAccount = userDatabase(userID, urlDatabase);
+  const currentAccount = database(userID, urlDatabase);
   if (currentAccount[currentURL]) {
     res.redirect(`${currentURL}`);
   }
@@ -205,7 +219,7 @@ app.get("/status", (req, res) => {
     status,
     message: statusMessage(status),
   };
-  res.render("status_page", templateVars);
+  res.render("errors_page", templateVars);
 });
 
 // Delete / Edit Routes
