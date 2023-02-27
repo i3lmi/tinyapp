@@ -246,5 +246,5 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 // Server Connection
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Tiny app is listening on port ${PORT}!`);
 });
