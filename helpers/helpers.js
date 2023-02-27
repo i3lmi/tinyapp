@@ -1,20 +1,17 @@
-const bcrypt = require("bcrypt");
-
-function getUserByEmail(email, database) {
-  for (let id in database) {
-    console.log("users[id].email: ", database[id].email);
-    if (database[id].email === email) {
-      return id;
+const getUserByEmail = function (email, users) {
+  for (let key in users) {
+    if (users[key].email === email) {
+      return users[key];
     }
   }
   return undefined;
-}
+};
 
 //generates random string of with 6 characters
 function generateRandomString() {
   return (Math.random() + 1).toString(36).substring(7);
 }
-//checks if email exist in the users
+//checks if email exist in the database
 const emailExist = function (users, email) {
   for (let key in users) {
     if (users[key].email === email) {
@@ -23,6 +20,8 @@ const emailExist = function (users, email) {
   }
   return false;
 };
+
+const bcrypt = require("bcrypt");
 const hashPassword = function (password) {
   return bcrypt.hashSync(password, 10);
 };
@@ -31,7 +30,8 @@ const isEqualToHash = function (password, hashedPassword) {
   return bcrypt.compareSync(password, hashedPassword);
 };
 
-const database = function (userID, urlDatabase) {
+//creates a userDatabase
+const userDatabase = function (userID, urlDatabase) {
   const newDatabase = {};
   for (let user in urlDatabase) {
     const currentID = urlDatabase[user].userID;
@@ -71,7 +71,7 @@ module.exports = {
   emailExist,
   hashPassword,
   isEqualToHash,
-  database,
+  userDatabase,
   statusMessage,
   changeStatus,
 };

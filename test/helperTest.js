@@ -16,14 +16,19 @@ const testUsers = {
 };
 
 describe("getUserByEmail", function () {
-  it("should return a user with valid email", function () {
+  it("should return a user object with valid email", function () {
     const user = getUserByEmail("user@example.com", testUsers);
-    const expectedUserID = "userRandomID";
-    assert.isTrue(user === expectedUserID);
+    const expectedUser = {
+      id: "userRandomID",
+      email: "user@example.com",
+      password: "purple-monkey-dinosaur",
+    };
+    assert.deepEqual(user, expectedUser);
   });
+
   it("should return undefined with invalid email", function () {
     const user = getUserByEmail("incorrect@example.com", testUsers);
     const expectedOutput = undefined;
-    assert.isTrue(user === expectedOutput);
+    assert.equal(user, expectedOutput);
   });
 });

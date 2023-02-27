@@ -1,20 +1,21 @@
 const express = require("express");
 const app = express();
+const PORT = 8080; // default port 8080
 const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
-const PORT = 8080; // default port 8080
+
 const {
   generateRandomString,
   emailExist,
   getUserByEmail,
   hashPassword,
   isEqualToHash,
-  database,
+  userDatabase,
   statusMessage,
   changeStatus,
 } = require("./helpers/helpers");
 
-
+app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cookieSession({
@@ -23,11 +24,10 @@ app.use(
   })
 );
 
-app.set("view engine", "ejs");
-let isLoggedIn = false;
 const urlDatabase = {};
 const users = {};
 let status = 200;
+let isLoggedIn = false;
 
 app.get("/urls", (req, res) => {
   status = res.statusCode;
@@ -36,7 +36,7 @@ app.get("/urls", (req, res) => {
     res.redirect("/status");
   } else {
     const userID = req.session.userID;
-    const usersUrl = database(userID, urlDatabase);
+    const usersUrl = userDatabase(userID, urlDatabase);
     const email = users[userID].email;
     const templateVars = {
       userID,
@@ -85,20 +85,6 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/u/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    let longURL = urlDatabase[req.params.shortURL].longURL;
-    if (!longURL.includes("https://")) {
-      longURL = "https://" + longURL;
-    }
-
-    res.status(302).redirect(longURL);
-  } else {
-    const errorMessage = "This short URL does not exist.";
-    res.status(404).send(errorMessage);
-  }
-});
-
 app.get("/urls/:shortURL", (req, res) => {
   status = res.statusCode;
   if (isLoggedIn) {
@@ -133,11 +119,13 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const currentURL = req.params.id;
   const userID = req.session.userID;
-  const currentAccount = database(userID, urlDatabase);
+  const currentAccount = userDatabase(userID, urlDatabase);
   if (currentAccount[currentURL]) {
     res.redirect(`${currentURL}`);
   }
 });
+
+// Reguster Routes
 
 app.get("/register", (req, res) => {
   status = res.statusCode;
@@ -213,6 +201,15 @@ app.post("/login", (req, res) => {
     res.redirect("/urls");
   }
 });
+app.get("/u/:id", (req, res) => {
+  const urlID = urlDatabase[req.params.id];
+  if (urlID === undefined) {
+    res.statusCode = 404;
+    return res.send("<html><h1>Error: shortURL does not exist</h1></html>");
+  } else {
+    res.redirect(urlID.longURL);
+  }
+});
 
 app.get("/status", (req, res) => {
   const templateVars = {
@@ -260,5 +257,5 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 // Server Connection
 app.listen(PORT, () => {
-  console.log(`Tiny app is listening on port ${PORT}!`);
+  console.log(`Example app listening on port ${PORT}!`);
 });
